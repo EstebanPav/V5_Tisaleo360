@@ -8,11 +8,11 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(cors()); // Habilitar CORS
+app.use(express.json()); // Parsear JSON
 app.use(compression()); // Habilitar compresión para respuestas
 
-// Servir archivos estáticos desde las nuevas ubicaciones
+// Servir archivos estáticos desde las carpetas indicadas
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
 app.use('/img', express.static(path.join(__dirname, 'img')));
@@ -26,13 +26,16 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log('Conectado a MongoDB Atlas AMIGO MIO :3'))
-  .catch((err) => console.error('Error conectando a MongoDB:', err));
+  .then(() => console.log('Conectado a MongoDB Atlas'))
+  .catch((err) => {
+    console.error('Error conectando a MongoDB:', err);
+    process.exit(1); // Salir si no se puede conectar
+  });
 
-// API endpoint para obtener datos desde la colección "scenes"
+// Endpoint para obtener datos desde la colección "scenes"
 app.get('/api/data', async (req, res) => {
   try {
-    const data = await mongoose.connection.db.collection('models').find().toArray();
+    const data = await mongoose.connection.db.collection('models').find().toArray(); // Cambiado a 'scenes'
     res.json(data);
   } catch (error) {
     console.error('Error al obtener los datos:', error);
@@ -40,10 +43,10 @@ app.get('/api/data', async (req, res) => {
   }
 });
 
-// Endpoint genérico para servir el frontend
+// Servir archivos estáticos desde la raíz del proyecto
 app.use(express.static(path.join(__dirname)));
 
-// Manejador para todas las rutas desconocidas
+// Manejador genérico para servir `index.html` en rutas desconocidas
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });

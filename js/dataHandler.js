@@ -4,7 +4,7 @@
 export async function getPanoramaData() {
   try {
     // Solicita los datos desde la API
-    const response = await fetch('http://localhost:3000/api/data');
+    const response = await fetch('https://v5-tisaleo360.onrender.com/api/data');
     if (!response.ok) {
       throw new Error('Error al obtener los datos');
     }
