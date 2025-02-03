@@ -19,8 +19,8 @@ app.use(compression()); // Reducir tamaño de respuestas
 const cspDirectives = {
   defaultSrc: ["'self'"],
   scriptSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
-  imgSrc: ["'self'", "*", "data:"], // Permite imágenes de cualquier dominio
-  mediaSrc: ["'self'", "*"], // Permite audios y videos de cualquier dominio
+  imgSrc: ["'self'", "*", "data:", "blob:"], // Permite imágenes desde cualquier fuente, datos y blobs
+  mediaSrc: ["'self'", "*"], // Permite audios y videos desde cualquier fuente
   connectSrc: ["'self'", "*"], // Permite conexiones a cualquier dominio (útil para APIs y sockets)
   styleSrc: ["'self'", "'unsafe-inline'"]
 };
