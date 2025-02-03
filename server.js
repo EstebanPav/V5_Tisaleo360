@@ -14,7 +14,22 @@ const app = express();
 app.use(cors()); // Habilitar CORS para permitir solicitudes cruzadas
 app.use(express.json()); // Parsear JSON
 app.use(compression()); // Reducir tamaño de respuestas
-app.use(helmet()); // Seguridad en encabezados HTTP
+
+// Configuración avanzada de Helmet para permitir imágenes externas
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+        imgSrc: ["'self'", "https://i.imghippo.com", "https://i.postimg.cc", "https://s3.amazonaws.com"],
+        connectSrc: ["'self'", "https://i.imghippo.com", "https://i.postimg.cc", "https://s3.amazonaws.com"],
+        styleSrc: ["'self'", "'unsafe-inline'"]
+      },
+    },
+  })
+);
+
 app.use(morgan('combined')); // Logging profesional para seguimiento
 
 // Límite de solicitudes por IP para evitar abuso
