@@ -57,6 +57,33 @@ mongoose
     process.exit(1); // Salir si no se puede conectar a la base de datos
   });
 
+// Definir rutas API antes de los archivos estáticos
+app.get('/api/data', async (req, res) => {
+  try {
+    const data = await mongoose.connection.db.collection('models').find().toArray();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error('Error al obtener los datos:', error);
+    res.status(500).json({ error: 'Error interno del servidor al obtener los datos.' });
+  }
+});
+
+// Endpoint para obtener datos específicos por ID
+app.get('/api/data/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const scene = await mongoose.connection.db.collection('models').findOne({ id });
+    if (scene) {
+      res.status(200).json(scene);
+    } else {
+      res.status(404).json({ error: 'Escena no encontrada.' });
+    }
+  } catch (error) {
+    console.error('Error al obtener la escena:', error);
+    res.status(500).json({ error: 'Error interno del servidor al buscar la escena.' });
+  }
+});
+
 // Rutas de archivos estáticos
 app.use('/css', express.static(path.join(__dirname, 'css')));
 app.use('/js', express.static(path.join(__dirname, 'js')));
@@ -65,7 +92,7 @@ app.use('/icons', express.static(path.join(__dirname, 'icons')));
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
 app.use('/photos', express.static(path.join(__dirname, 'photos')));
 
-// Servir archivos estáticos desde la raíz del proyecto
+// Servir archivos estáticos después de definir las rutas API
 app.use(express.static(path.join(__dirname)));
 
 // Manejador de rutas no encontradas
