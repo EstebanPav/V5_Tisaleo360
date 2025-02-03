@@ -4,23 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ruta: CityTour Tisaleo</title>
-    <link rel="stylesheet" href="./css/index.css"/>
+    <link rel="stylesheet" href="./css/recorridos.css" />
     <script src="navigate.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/panolens@0.12.0/build/panolens.min.js"></script>
   </head>
   <body>
     <!-- Cabecera con el botón de regreso -->
     <div class="header">
-        <button class="back-button" onclick="navigate('index.html')">Regresar</button>
+      <button class="back-button" onclick="navigate('index.html')">Regresar al inicio</button>
     </div>
 
     <!-- Contenedor del visor -->
     <div id="container"></div>
 
-    <script src="js/libraries/three.min.js"></script>
-    <script src="js/libraries/panolens.min.js"></script>
+    <!-- Pie de página -->
+    <footer class="footer">
+      <p>📷 Autor: Estudiantes de las ESPE </p>
+    </footer>
 
     <!-- Script principal -->
     <script src="./js/index.js" type="module"></script>
-
   </body>
 </html>

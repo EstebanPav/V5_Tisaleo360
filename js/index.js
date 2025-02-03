@@ -1,51 +1,71 @@
-import { getPanoramaData, setFixedCameraLimits } from './dataHandler.js';
 import { createPanoramas, createHotspotActions } from './viewerLogic.js';
+import { updateAudioControl } from './audioLogic.js';
+import { getPanoramaData, setFixedCameraLimits } from './dataHandler.js';
+
+
 
 async function initializeViewer() {
   const viewerContainer = document.getElementById('container');
 
-  // Inicializa el visor de PANOLENS
   const viewer = new PANOLENS.Viewer({
     container: viewerContainer,
     controlBar: true,
-    autoRotate: false, // Cambiar a true si deseas una rotación automática
-    output: 'console', // Muestra información en la consola (útil para depuración)
+    autoRotate: true,
+    autoRotateSpeed: 1.5,
+    output: 'console',
   });
 
-  // Desactiva el zoom en el visor
-  const controls = viewer.getControl();
-  if (controls) {
-    controls.enableZoom = false;
-  } else {
-    console.warn('Controles de la cámara no disponibles.');
-  }
+  const visitedScenes = new Set();
+  let currentAudio = null;
 
-  // Ruta del endpoint de la API
-  const apiURL = 'https://v5-tisaleo360.onrender.com/api/data';
+  const stopCurrentAudio = () => {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio.currentTime = 0;
+    }
+  };
 
   try {
-    // 1. Cargar los datos desde la API
-    const data = await getPanoramaData(apiURL);
-
-    // 2. Crear panoramas con los datos obtenidos
+    const data = await getPanoramaData();
     const panoramas = createPanoramas(data);
 
-    // 3. Agregar cada panorama al visor
-    panoramas.forEach((panorama) => {
+    panoramas.forEach((panorama, index) => {
       viewer.add(panorama.image);
+
+      panorama.image.addEventListener('enter', () => {
+        stopCurrentAudio();
+        updateAudioControl(panorama.audio, stopCurrentAudio);
+
+        if (!visitedScenes.has(panorama.id) && panorama.audio) {
+          setTimeout(() => {
+            currentAudio = new Audio(panorama.audio);
+            currentAudio.play().catch(err => console.warn('Autoplay blocked:', err));
+            visitedScenes.add(panorama.id);
+          }, 5000);
+        }
+      });
+
+      if (index === 0) {
+        viewer.setPanorama(panorama.image);
+        updateAudioControl(panorama.audio, stopCurrentAudio);
+
+        if (panorama.audio) {
+          setTimeout(() => {
+            currentAudio = new Audio(panorama.audio);
+            currentAudio.play().catch(err => console.warn('Autoplay blocked:', err));
+            visitedScenes.add(panorama.id);
+          }, 5000);
+        }
+      }
     });
 
-    // 4. Configurar hotspots para conectar panoramas o mostrar información
     createHotspotActions(data, panoramas, viewer);
-
-    // 5. Aplicar límites de movimiento de la cámara
     setFixedCameraLimits(viewer);
 
-    console.log('Visor inicializado con éxito.');
+    console.log('Viewer initialized successfully.');
   } catch (error) {
-    console.error('Error inicializando la aplicación:', error);
+    console.error('Error initializing viewer:', error);
   }
 }
 
-// Inicializar la aplicación
 initializeViewer();

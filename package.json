@@ -2,9 +2,16 @@
   "dependencies": {
     "compression": "^1.7.5",
     "cors": "^2.8.5",
+    "dompurify": "^3.2.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
     "mongodb": "^6.12.0",
-    "mongoose": "^8.9.2"
+    "mongoose": "^8.9.2",
+    "morgan": "^1.10.0",
+    "sanitize-html": "^2.14.0",
+    "three": "^0.172.0"
   }
 }
