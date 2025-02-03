@@ -15,18 +15,21 @@ app.use(cors()); // Habilitar CORS para permitir solicitudes cruzadas
 app.use(express.json()); // Parsear JSON
 app.use(compression()); // Reducir tamaño de respuestas
 
-// Configuración avanzada de Helmet para permitir imágenes externas
+// Configuración manual de Content Security Policy (CSP)
+const cspDirectives = {
+  defaultSrc: ["'self'"],
+  scriptSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
+  imgSrc: ["'self'", "https://i.imghippo.com", "https://i.postimg.cc", "https://s3.amazonaws.com", "data:"],
+  connectSrc: ["'self'", "https://i.imghippo.com", "https://i.postimg.cc", "https://s3.amazonaws.com"],
+  styleSrc: ["'self'", "'unsafe-inline'"]
+};
+
+// Aplicar CSP manualmente
 app.use(
   helmet({
     contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"],
-        imgSrc: ["'self'", "https://i.imghippo.com", "https://i.postimg.cc", "https://s3.amazonaws.com"],
-        connectSrc: ["'self'", "https://i.imghippo.com", "https://i.postimg.cc", "https://s3.amazonaws.com"],
-        styleSrc: ["'self'", "'unsafe-inline'"]
-      },
-    },
+      directives: cspDirectives
+    }
   })
 );
 
@@ -61,33 +64,6 @@ app.use('/img', express.static(path.join(__dirname, 'img')));
 app.use('/icons', express.static(path.join(__dirname, 'icons')));
 app.use('/videos', express.static(path.join(__dirname, 'videos')));
 app.use('/photos', express.static(path.join(__dirname, 'photos')));
-
-// Endpoint para obtener todos los datos
-app.get('/api/data', async (req, res) => {
-  try {
-    const data = await mongoose.connection.db.collection('models').find().toArray();
-    res.status(200).json(data);
-  } catch (error) {
-    console.error('Error al obtener los datos:', error);
-    res.status(500).json({ error: 'Error interno del servidor al obtener los datos.' });
-  }
-});
-
-// Endpoint para obtener datos específicos por ID
-app.get('/api/data/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const scene = await mongoose.connection.db.collection('models').findOne({ id });
-    if (scene) {
-      res.status(200).json(scene);
-    } else {
-      res.status(404).json({ error: 'Escena no encontrada.' });
-    }
-  } catch (error) {
-    console.error('Error al obtener la escena:', error);
-    res.status(500).json({ error: 'Error interno del servidor al buscar la escena.' });
-  }
-});
 
 // Servir archivos estáticos desde la raíz del proyecto
 app.use(express.static(path.join(__dirname)));
